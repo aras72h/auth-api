@@ -1,4 +1,4 @@
-// server.js
+// Implement basic user CRUD and authentication
 const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
@@ -10,6 +10,7 @@ dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
+
 
 const generateToken = (user) => {
     return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
