@@ -47,7 +47,6 @@ This is a basic user authentication API built with Node.js, Express, and Sequeli
 
    ```plaintext
    PORT=5000
-   DATABASE_URL=postgres://username:password@localhost:5432/auth-app
    JWT_SECRET=your_jwt_secret
    DB_NAME=auth-app
    DB_USER=username
@@ -95,7 +94,3 @@ curl -X POST http://localhost:5000/api/auth/login \
 ### License
 
 This project is licensed under the MIT License.
-
----
-
-Feel free to modify the README as per your project's specific needs!
