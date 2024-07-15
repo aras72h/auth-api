@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const pool = require('./config/db');
+const sequelize = require('./config/db');
+const User = require('./models/User');
 
 dotenv.config();
 
@@ -24,21 +26,16 @@ app.post('/api/auth/register', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Handle existing users
-        const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (userExists.rows.length > 0) {
+        const userExists = await User.findOne({ where: { email } });
+        if (userExists) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
         // Create user
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await pool.query(
-            'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *',
-            [email, hashedPassword]
-        );
+        const newUser = await User.create({ email, password: hashedPassword });
 
-        // Generate and send back JWT token
-        const token = generateToken(newUser.rows[0]);
+        const token = generateToken(newUser);
         res.status(201).json({ token });
     } catch (err) {
         console.error(err.message);
@@ -47,25 +44,26 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 
+
 // Login a user
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
         // Check user email
-        const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (user.rows.length === 0) {
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         // Check password
-        const isMatch = await bcrypt.compare(password, user.rows[0].password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         // Generate and send JWT token
-        const token = generateToken(user.rows[0]);
+        const token = generateToken(user);
         res.json({ token });
     } catch (err) {
         console.error(err.message);
@@ -106,16 +104,29 @@ app.put('/api/users', authMiddleware, async (req, res) => {
         // Hash the new password if provided
         const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
 
-        const updatedUser = await pool.query(
-            'UPDATE users SET email = COALESCE($1, email), password = COALESCE($2, password) WHERE id = $3 RETURNING *',
-            [email, hashedPassword, id]
-        );
+        // Create an object with the fields to update
+        const updatedFields = {};
+        if (email) updatedFields.email = email;
+        if (hashedPassword) updatedFields.password = hashedPassword;
 
-        if (updatedUser.rows.length === 0) {
+        // Check if there are fields to update
+        if (Object.keys(updatedFields).length === 0) {
+            return res.status(400).json({ message: 'No fields provided for update' });
+        }
+
+        // Update the user using Sequelize's update method
+        const [affectedRows] = await User.update(updatedFields, {
+            where: { id }
+        });
+
+        if (affectedRows === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.json({ user: updatedUser.rows[0] });
+        // Fetch the updated user to return in the response
+        const updatedUser = await User.findByPk(id);
+
+        res.json({ user: updatedUser });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });
@@ -128,12 +139,12 @@ app.delete('/api/users', authMiddleware, async (req, res) => {
     const id = req.user.id; // Get the user ID from the authenticated user
 
     try {
-        const deletedUser = await pool.query(
-            'DELETE FROM users WHERE id = $1 RETURNING *',
-            [id]
-        );
+        // Use Sequelize to delete the user
+        const deletedUser = await User.destroy({
+            where: { id }
+        });
 
-        if (deletedUser.rows.length === 0) {
+        if (deletedUser === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
 
@@ -145,8 +156,18 @@ app.delete('/api/users', authMiddleware, async (req, res) => {
 });
 
 
-// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await sequelize.sync();
+        console.log('Database synchronized');
+        // Start server
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Error syncing database:', error);
+    }
+};
+
+startServer();
