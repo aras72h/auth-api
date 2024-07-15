@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const pool = require('./config/db');
 const sequelize = require('./config/db');
 const User = require('./models/User');
 
@@ -42,7 +41,6 @@ app.post('/api/auth/register', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-
 
 
 // Login a user
