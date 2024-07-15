@@ -70,8 +70,8 @@ The server will run on `http://localhost:5000`.
 
 - **POST** `/api/auth/register`: Register a new user
 - **POST** `/api/auth/login`: Log in a user
-- **PUT** `/api/users`: Update user information
-- **DELETE** `/api/users`: Delete a user account
+- **PUT** `/api/users`: Update user information (requires token)
+- **DELETE** `/api/users`: Delete a user account (requires token)
 
 ### Example Usage
 
@@ -89,6 +89,24 @@ curl -X POST http://localhost:5000/api/auth/register \
 curl -X POST http://localhost:5000/api/auth/login \
 -H "Content-Type: application/json" \
 -d '{"email": "user@example.com", "password": "password123"}'
+```
+
+This will return a JWT token that you must include in the Authorization header for protected routes.
+
+#### Update User Information
+
+```bash
+curl -X PUT http://localhost:5000/api/users \
+-H "Authorization: Bearer YOUR_JWT_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"email": "newemail@example.com", "password": "newpassword123"}'
+```
+
+#### Delete User Account
+
+```bash
+curl -X DELETE http://localhost:5000/api/users \
+-H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### License
