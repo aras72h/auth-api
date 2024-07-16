@@ -1,8 +1,10 @@
+Here's the updated README file without the emailing part:
+
 # User Authentication API
 
 ## Overview
 
-This is a basic user authentication API built with Node.js, Express, and Sequelize. It allows users to register, log in, update their information, and delete their accounts.
+This is a basic user authentication API built with Node.js, Express, and Sequelize. It allows users to register, log in, update their information, delete their accounts, and manage password recovery.
 
 ## Features
 
@@ -11,6 +13,8 @@ This is a basic user authentication API built with Node.js, Express, and Sequeli
 - Update user information (email and password)
 - Delete user account
 - JWT-based authentication
+- Forgot password functionality
+- Reset password functionality
 
 ## Technologies Used
 
@@ -72,6 +76,8 @@ The server will run on `http://localhost:5000`.
 - **POST** `/api/auth/login`: Log in a user
 - **PUT** `/api/users`: Update user information (requires token)
 - **DELETE** `/api/users`: Delete a user account (requires token)
+- **POST** `/api/auth/forgot-password`: Request a password reset
+- **POST** `/api/auth/reset-password`: Reset a user's password
 
 ### Example Usage
 
@@ -107,6 +113,22 @@ curl -X PUT http://localhost:5000/api/users \
 ```bash
 curl -X DELETE http://localhost:5000/api/users \
 -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### Request Password Reset
+
+```bash
+curl -X POST http://localhost:5000/api/auth/forgot-password \
+-H "Content-Type: application/json" \
+-d '{"email": "user@example.com"}'
+```
+
+#### Reset Password
+
+```bash
+curl -X POST http://localhost:5000/api/auth/reset-password \
+-H "Content-Type: application/json" \
+-d '{"token": "YOUR_RESET_TOKEN", "newPassword": "newpassword123"}'
 ```
 
 ### License
