@@ -1,5 +1,3 @@
-Here's the updated README file with the new environment variables and including the forgot password and reset password functionalities:
-
 # User Authentication API
 
 ## Overview
@@ -88,6 +86,7 @@ The server will run on `http://localhost:5000`.
 - **DELETE** `/api/users`: Delete a user account (requires token)
 - **POST** `/api/auth/forgot-password`: Request a password reset
 - **POST** `/api/auth/reset-password`: Reset a user's password
+- **GET** `/api/auth/reset-password`: Verify reset token
 
 ### Example Usage
 
@@ -139,6 +138,29 @@ curl -X POST http://localhost:5000/api/auth/forgot-password \
 curl -X POST http://localhost:5000/api/auth/reset-password \
 -H "Content-Type: application/json" \
 -d '{"token": "YOUR_RESET_TOKEN", "newPassword": "newpassword123"}'
+```
+
+#### Verify Reset Token
+
+```bash
+curl -X GET "http://localhost:5000/api/auth/reset-password?token=your_reset_token"
+```
+
+If the token is valid, you will receive a response like:
+
+```json
+{
+    "message": "Valid token",
+    "token": "your_reset_token"
+}
+```
+
+If the token is invalid or expired, you will receive a response like:
+
+```json
+{
+    "message": "Invalid or expired reset token."
+}
 ```
 
 ### License

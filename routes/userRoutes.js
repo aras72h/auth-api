@@ -11,6 +11,7 @@ router.put('/', authMiddleware, userController.updateUser);
 router.delete('/', authMiddleware, userController.deleteUser);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
+router.get('/reset-password', userController.verifyResetToken);
 
 
 module.exports = router;

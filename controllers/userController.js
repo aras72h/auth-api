@@ -192,3 +192,26 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({ message: 'Server error.' });
     }
 };
+
+
+exports.verifyResetToken = async (req, res) => {
+    const { token } = req.query;
+
+    try {
+        const user = await User.findOne({
+            where: {
+                resetToken: token,
+                resetTokenExpiry: { [Op.gt]: Date.now() },
+            },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired reset token.' });
+        }
+
+        res.json({ message: 'Valid token', token });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ message: 'Server error.' });
+    }
+};
