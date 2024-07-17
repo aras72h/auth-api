@@ -153,8 +153,9 @@ exports.forgotPassword = async (req, res) => {
         user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
         await user.save();
 
-        // Send email with reset link (dummy link for now)
-        const resetLink = `http://localhost:5000/api/auth/reset-password?token=${resetToken}`;
+        // Construct the reset link
+        const resetLink = `${process.env.PROD_DOMAIN}/api/auth/reset-password?token=${resetToken}`;
+        // Send email with reset link
         sendEmail(user.email, 'Password Reset Request', `Reset your password using this link: ${resetLink}`);
         res.json({ message: 'Password reset link has been sent to email address.' });
     } catch (err) {
