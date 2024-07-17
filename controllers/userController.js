@@ -4,6 +4,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto'); // For generating tokens
 const { Op } = require('sequelize');
+const sendEmail = require('../utils/mail');
 
 
 
@@ -152,9 +153,10 @@ exports.forgotPassword = async (req, res) => {
         user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
         await user.save();
 
-        // For now, return the reset link in the response
+        // Send email with reset link (dummy link for now)
         const resetLink = `http://localhost:5000/api/auth/reset-password?token=${resetToken}`;
-        res.json({ message: 'Password reset link generated.', resetLink });
+        sendEmail(user.email, 'Password Reset Request', `Reset your password using this link: ${resetLink}`);
+        res.json({ message: 'Password reset link has been sent to email address.' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error.' });
