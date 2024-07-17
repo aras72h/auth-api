@@ -55,8 +55,8 @@ This is a basic user authentication API built with Node.js, Express, and Sequeli
    PROD_DOMAIN=https://www.example.com
 
    DB_NAME=auth-app
-   DB_USER=postgres
-   DB_PASSWORD=1
+   DB_USER=your_db_user
+   DB_PASSWORD=your_db_password
    DB_HOST=localhost
    DB_PORT=5432
 
