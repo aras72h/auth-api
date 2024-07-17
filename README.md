@@ -1,4 +1,4 @@
-Here's the updated README file without the emailing part:
+Here's the updated README file with the new environment variables and including the forgot password and reset password functionalities:
 
 # User Authentication API
 
@@ -52,10 +52,20 @@ This is a basic user authentication API built with Node.js, Express, and Sequeli
    ```plaintext
    PORT=5000
    JWT_SECRET=your_jwt_secret
+   PROD_DOMAIN=https://www.example.com
+
    DB_NAME=auth-app
-   DB_USER=username
-   DB_PASSWORD=password
+   DB_USER=postgres
+   DB_PASSWORD=1
    DB_HOST=localhost
+   DB_PORT=5432
+
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=465
+   SMTP_SECURE=true
+   SMTP_USER=your_email@gmail.com
+   SMTP_PASS=your_smtp_password
+   EMAIL_FROM=no-reply@gmail.com
    ```
 
 4. Run database migrations to set up the tables (if applicable).
